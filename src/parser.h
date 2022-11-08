@@ -10,6 +10,13 @@ typedef struct {
     char **translations;
 } parsedLine;
 
+typedef struct {
+    char *raw;
+    char *translated;
+} translation;
+
 parsedLine *parseLine(FILE *fp);
+void addKeyword(translation *addition);
+void initParser();
 
 #endif

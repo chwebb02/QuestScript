@@ -8,9 +8,10 @@
 
 #include "linkedList.h"
 
+list keywords;
 
-void addKeyword() {
-    
+void addKeyword(translation *addition) {
+    appendList(&keywords, addition);
 }
 
 unsigned int getFieldCount(char *data) {
@@ -49,9 +50,7 @@ int fillFields(parsedLine *line, char *data) {
 }
 
 int translateFields(parsedLine *line) {
-    // TODO: translates keywords into instructions
-    // need to figure out way to make extensible for
-    // libraries and the like
+    
     
     return 0;
 }
@@ -68,6 +67,11 @@ parsedLine *parseLine(FILE *fp) {
     if (fillFields(line, raw)) return NULL;
 
     return line;
+}
+
+void initParser() {
+    keywords = makeList();
+
 }
 
 #endif
