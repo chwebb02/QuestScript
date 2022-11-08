@@ -28,8 +28,8 @@ int fillFields(parsedLine *line, char *data) {
                 if (line->fields[i] == NULL)
                     return 1;
 
-                for (int m = n - 1; m >= startPos; m--) {
-                    line->fields[i][m] = data[m];
+                for (int m = n - startPos; m >= 0; m--) {
+                    line->fields[i][m] = data[m + startPos];
                 }
 
                 startPos = n + 1;
@@ -38,6 +38,14 @@ int fillFields(parsedLine *line, char *data) {
         }
     }
 
+    return 0;
+}
+
+int translateFields(parsedLine *line) {
+    // TODO: translates keywords into instructions
+    // need to figure out way to make extensible for
+    // libraries and the like
+    
     return 0;
 }
 
