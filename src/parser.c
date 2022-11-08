@@ -6,6 +6,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "linkedList.h"
+
+
+void addKeyword() {
+    
+}
+
 unsigned int getFieldCount(char *data) {
     unsigned int output = 1;
 

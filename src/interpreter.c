@@ -12,6 +12,7 @@ int *interpretLine(int *line, parsedLine info) {
     *line += 1;
 
 
+
     errorInfo[1] = 0;
     return errorInfo;
 }
