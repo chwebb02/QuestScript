@@ -6,9 +6,6 @@
 
 #include "parser.h"
 
-// REMOVE THIS
-#include "linkedList.h"
-
 int *interpretLine(int *line, parsedLine info) {
     int *errorInfo = malloc (2 * sizeof(int));
     errorInfo[1] = *line;
@@ -26,19 +23,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("\n");
-
-    list myList = makeList();
-    int x = 5, y = 10, z = 25;
-    appendList(&myList, &x);
-    appendList(&myList, &y);
-    appendList(&myList, &z);
-    for (int i = 1; i <= 3; i++)
-        printf("%d ", *((int *) fromList(myList, i)));
-    printf("\n");
-    popList(&myList, 0);
-    for (int i = 1; i <= 2; i++)
-        printf("%d ", *((int *) fromList(myList, i)));
     printf("\n");
 
     // Open the file
