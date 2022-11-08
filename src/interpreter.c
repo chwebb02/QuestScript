@@ -5,15 +5,26 @@
 #include <stdlib.h>
 
 #include "parser.h"
+#include "errors.h"
 
-int *interpretLine(int *line, parsedLine info) {
+int function(char *funcName, parsedLine *line, unsigned int funcIndex) {
+    return 0;
+}
+
+int *interpretLine(int *line, parsedLine *info) {
     int *errorInfo = malloc (2 * sizeof(int));
-    errorInfo[1] = *line;
+    errorInfo[0] = *line;
     *line += 1;
 
+    // Iterate over each field of the parsedLine
+    for (int i = 0; i < info->fieldCount; i++) {
+        // Go to next field if no translation is found
+        if (info->translations[i] == NULL)
+            continue;
+        
+        errorInfo[1] = function(info->translations[i], info, i);
+    }
 
-
-    errorInfo[1] = 0;
     return errorInfo;
 }
 
@@ -32,10 +43,15 @@ int main(int argc, char *argv[]) {
         return 2;
     }
 
+    // Initialize the components of the system
+    initParser();
+
     int line = 1;
     int *error = malloc (2 * sizeof(int));
     while(!feof(fp)) {
         parsedLine *myLine = parseLine(fp);
+
+        errorHandler(interpretLine(&line, myLine));
 
         free(myLine);
     }
