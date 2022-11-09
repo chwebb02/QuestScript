@@ -3,16 +3,16 @@
 
 #include <stdio.h>
 
-typedef struct {
+typedef struct linestruct {
     unsigned int fieldCount;
     char **fields;
     unsigned int keywordCount;
-    char **translations;
+    int (**function)(struct linestruct *, void **); // array of function pointers to relevant library functions
 } parsedLine;
 
 typedef struct {
     char *raw;
-    char *translated;
+    int (*translation)(struct linestruct *, void **); // function pointer corresponding to a keyword
 } translation;
 
 parsedLine *parseLine(FILE *fp);

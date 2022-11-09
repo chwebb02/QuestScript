@@ -50,9 +50,11 @@ int fillFields(parsedLine *line, char *data) {
 }
 
 int translateFields(parsedLine *line) {
+    line->function = malloc (line->fieldCount * sizeof(void *));
+    
     // Iterate over each field in the parsedLine
     for (int i = 0; i < line->fieldCount; i++) {
-        line->translations[i] = NULL;
+        line->function[i] = NULL;
 
         // Iterate over each keyword, checking for a match
         for (int n = 0; n < keywords.size; n++) {
@@ -61,9 +63,7 @@ int translateFields(parsedLine *line) {
 
             // If the strings match, assign the translation to the associated translation in the parsedLine
             if (!strcmp(comparison->raw, line->fields[i])) {
-                line->translations[i] = malloc (strlen(comparison->translated) * sizeof(char));
-
-                strcpy(line->translations[i], comparison->translated);
+                line->function[i] = comparison->translation;
             }
         }
     }
