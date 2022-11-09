@@ -1,16 +1,23 @@
 #ifndef __interpreter__
 #define __interpreter__
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "parser.h"
 #include "errors.h"
 
+// Need to find a more elegant way to make this work
+// This is the header file that contains all of the libraries that the application uses
+#include "library.h"
+
 // Import a library
 int import(parsedLine *line) {
 	if (line->fieldCount > 2)
 		return FIELD_COUNT;
+
+	
 
 	return 0;
 }

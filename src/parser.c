@@ -8,6 +8,7 @@
 
 #include "linkedList.h"
 
+// List of keywords and their translations
 list keywords;
 
 void addKeyword(translation *addition) {
