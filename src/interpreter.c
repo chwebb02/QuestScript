@@ -7,8 +7,10 @@
 #include "parser.h"
 #include "errors.h"
 
+// Import a library
 int import(parsedLine *line) {
-
+	if (line->fieldCount > 2)
+		return FIELD_COUNT;
 
 	return 0;
 }
@@ -28,6 +30,9 @@ int *interpretLine(int *line, parsedLine *info) {
 		// Go to next field if no translation is found
 		if (info->function[i] == NULL)
 			continue;
+		
+		// Run the parsedLine through the function
+		errorInfo[1] = info->function[i](info);
 	}
 
 	return errorInfo;

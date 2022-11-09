@@ -5,7 +5,7 @@ void errorHandler(int *);
 
 enum Errors {
     FUNC_FAILED = 1,
-    VARIABLE_ERROR,
+    FIELD_COUNT,
 };
 
 #endif

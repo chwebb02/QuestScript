@@ -13,10 +13,14 @@ void errorHandler(int *errorCode) {
         return;
 
     printf("ERROR >> ");
-    if (errorCode[1] == FUNC_FAILED)
-        printf("function failed");
-    else if (errorCode[1] == VARIABLE_ERROR)
-        printf("variable error");
+    switch (errorCode[1]) {
+        case FUNC_FAILED:
+            printf("function failed");
+            break;
+        case FIELD_COUNT:
+            printf("wrong field count");
+            break;
+    }
         
     printf(" on line %d!\n", errorCode[0]);
 }
