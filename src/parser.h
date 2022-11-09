@@ -7,16 +7,16 @@ typedef struct linestruct {
     unsigned int fieldCount;
     char **fields;
     unsigned int keywordCount;
-    int (**function)(struct linestruct *, void **); // array of function pointers to relevant library functions
+    int (**function)(struct linestruct *); // array of function pointers to relevant library functions
 } parsedLine;
 
 typedef struct {
     char *raw;
-    int (*translation)(struct linestruct *, void **); // function pointer corresponding to a keyword
+    int (*translation)(struct linestruct *); // function pointer corresponding to a keyword
 } translation;
 
 parsedLine *parseLine(FILE *fp);
 void addKeyword(translation *addition);
-void initParser();
+int initParser(int (*)(parsedLine *), int (*)(parsedLine *));
 
 #endif

@@ -7,6 +7,18 @@
 #include "parser.h"
 #include "errors.h"
 
+int import(parsedLine *line) {
+
+
+	return 0;
+}
+
+int assign(parsedLine *line) {
+
+
+	return 0;
+}
+
 int *interpretLine(int *line, parsedLine *info) {
 	int *errorInfo = malloc (2 * sizeof(int));
 	errorInfo[0] = *line;
@@ -37,7 +49,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Initialize the components of the system
-	initParser();
+	initParser(import, assign);
 
 	int line = 1;
 	int *error = malloc (2 * sizeof(int));

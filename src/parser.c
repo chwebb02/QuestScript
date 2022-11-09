@@ -85,8 +85,30 @@ parsedLine *parseLine(FILE *fp) {
     return line;
 }
 
-void initParser() {
+int initParser(int (*pImport)(parsedLine *), int (*pAssign)(parsedLine *)) {
     keywords = makeList();
+
+    translation import, assign;
+    
+    // Import translation
+    import.raw = malloc (7 * sizeof(char));
+    if (import.raw == NULL)
+        return 2;
+    strcpy(import.raw, "import");
+    import.translation = pImport;
+
+    // Assign translation
+    assign.raw = malloc (6 * sizeof(char));
+    if (assign.raw == NULL)
+        return 3;
+    strcpy(assign.raw, "assign");
+    assign.translation = pAssign;
+
+    // Append the translations to the keywords list
+    appendList(&keywords, &import);
+    appendList(&keywords, &assign);
+
+    return 0;
 }
 
 #endif
