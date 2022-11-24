@@ -8,10 +8,6 @@
 #include "parser.h"
 #include "errors.h"
 
-// Need to find a more elegant way to make this work
-// This is the header file that contains all of the libraries that the application uses
-#include "library.h"
-
 // Import a library
 int import(parsedLine *line) {
 	if (line->fieldCount > 2)
@@ -35,11 +31,11 @@ int *interpretLine(int *line, parsedLine *info) {
 	// Iterate over each field of the parsedLine
 	for (int i = 0; i < info->fieldCount; i++) {
 		// Go to next field if no translation is found
-		if (info->function[i] == NULL)
+		if (info->keywords[i].translation == NULL)
 			continue;
 		
 		// Run the parsedLine through the function
-		errorInfo[1] = info->function[i](info);
+		errorInfo[1] = info->keywords[i].translation(info);
 	}
 
 	return errorInfo;
@@ -61,7 +57,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Initialize the components of the system
-	initParser(import, assign);
+	initParser(&import, &assign);
 
 	int line = 1;
 	int *error = malloc (2 * sizeof(int));
@@ -70,7 +66,7 @@ int main(int argc, char *argv[]) {
 
 		errorHandler(interpretLine(&line, myLine));
 
-		free(myLine);
+		freeParsedLine(&myLine);
 	}
 }
 

@@ -5,85 +5,125 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "linkedList.h"
+#include "errors.h"
 
 // List of keywords and their translations
 list keywords;
 
+// add a new keyword translation
 void addKeyword(translation *addition) {
     appendList(&keywords, addition);
 }
 
-unsigned int getFieldCount(char *data) {
-    unsigned int output = 1;
+int countFields(char *buffer) {
+    int fields = 0;
 
-    for (int i = 0; i < strlen(data); i++) {
-        if (data[i] == ' ')
-            output += 1;
+    int open = 0;
+    for (int i = 0; i < strlen(buffer); i++) {
+        if (buffer[i] == '(') {
+            open += 1;
+
+            if (i > 0)
+                if (buffer[i - 1] != ' ') fields += 1;
+        }
+
+        if (!open) {
+            if (buffer[i] == ' ' || buffer[i] == '\n')
+                fields += 1;
+        }
+
+        if (buffer[i] == ')' && open) {
+            open -= 1;
+            fields += 1;
+        }
+        else if (!open && buffer[i] == ')')
+            return -1;
     }
 
-    return output;
+    return fields + 1;
 }
 
-int fillFields(parsedLine *line, char *data) {
-    line->fields = malloc (line->fieldCount * sizeof(char *));
+int setFields(parsedLine *line, FILE *fp) {
+    char *buffer = malloc (BUFSIZ * sizeof(char));
+    if (buffer == NULL)
+        return BAD_MALLOC;
     
+    // Get Field Count
+    fgets(buffer, BUFSIZ, fp);
+    line->fieldCount = countFields(buffer);
+
+    if (line->fieldCount = -1)
+        return DANGLING_PARENTHESIS;
+    
+    line->keywords = malloc (line->fieldCount * sizeof(translation));
+    if (line->keywords == NULL)
+        return BAD_MALLOC;
+    
+    // Set raw component of field translation
     int startPos = 0;
-    for (int i = 0; i < line->fieldCount; i++) {
-        for (int n = startPos; n < strlen(data); n++) {            
-            if (data[n] == ' ' || data[n] == '\n') {
-                line->fields[i] = malloc ((n - startPos) * sizeof(char));
-                if (line->fields[i] == NULL)
-                    return 1;
+    for (int i = 0; i < line->fieldCount; i++) { // iterate over the field count
+        line->keywords[i].raw = malloc (BUFSIZ * sizeof(char));
+        if (line->keywords[i].raw == NULL)
+            return BAD_MALLOC;
 
-                for (int m = n - startPos; m >= 0; m--) {
-                    line->fields[i][m] = data[m + startPos];
-                }
-
+        for (int n = startPos; n < strlen(buffer); i++) {
+            if (buffer[n] = ' ') {
                 startPos = n + 1;
                 break;
             }
+
+            line->keywords[i].raw[n - startPos] = buffer[n];
         }
     }
 
+    free(buffer);
     return 0;
 }
 
-int translateFields(parsedLine *line) {
-    line->function = malloc (line->fieldCount * sizeof(void *));
-    
-    // Iterate over each field in the parsedLine
-    for (int i = 0; i < line->fieldCount; i++) {
-        line->function[i] = NULL;
+void translateFields(parsedLine *line) {
+    for (int i = 0; i < line->fieldCount; i++) { // iterate over the number of fields
+        for (int n = 0; n < keywords.size; i++) { // iterate over the list of keywords
+            bool matchFound = false;
 
-        // Iterate over each keyword, checking for a match
-        for (int n = 0; n < keywords.size; n++) {
-            // Assign a translation from the keywords list
-            translation *comparison = fromList(keywords, n);
-
-            // If the strings match, assign the translation to the associated translation in the parsedLine
-            if (!strcmp(comparison->raw, line->fields[i])) {
-                line->function[i] = comparison->translation;
+            if (!strcmp(fromList(keywords, (unsigned int) n), line->keywords[i].raw)) {
+                matchFound = true;
+                line->keywords[i].translation = ((translation *) fromList(keywords, (unsigned int) n))->translation;
             }
+
+            if (!matchFound)
+                line->keywords[i].translation = NULL;
         }
     }
-    
-    return 0;
 }
 
+/*
+Takes a line from a file as input and returns a parsed line
+pointer to the calling function, or NULL if there is an error 
+*/
 parsedLine *parseLine(FILE *fp) {
+    // Make room for the parsedLine
     parsedLine *line = malloc (sizeof(parsedLine));
-
-    char *raw = malloc (BUFSIZ * sizeof(char));
-    if (raw == NULL)
+    if (line == NULL || !fp)
         return NULL;
-    fgets(raw, BUFSIZ, fp);
 
-    line->fieldCount = getFieldCount(raw);
-    if (fillFields(line, raw)) return NULL;
+    // Set the fieldCount and the raw fields of the translation
+    if (setFields(line, fp))
+        return NULL;
+
+    // Translate the raw fields of the translation
+    translateFields(&line);
 
     return line;
+}
+
+void freeParsedLine(parsedLine **line) {
+    for (int i = 0; i < (*line)->fieldCount; i++)
+        free((*line)->keywords[i].raw);
+    free(*line);
+    *line = NULL;
 }
 
 int initParser(int (*pImport)(parsedLine *), int (*pAssign)(parsedLine *)) {

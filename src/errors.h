@@ -15,6 +15,8 @@ enum Errors {
     VALUE_NULL,
     TYPE_CONVERSION,
     NO_ASSIGNMENT_VALUE,
+    BAD_MALLOC,
+    DANGLING_PARENTHESIS,
 };
 
 #endif

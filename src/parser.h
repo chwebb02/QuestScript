@@ -3,20 +3,21 @@
 
 #include <stdio.h>
 
-typedef struct linestruct {
-    unsigned int fieldCount;
-    char **fields;
-    unsigned int keywordCount;
-    int (**function)(struct linestruct *); // array of function pointers to relevant library functions
-} parsedLine;
+struct linestruct;
 
 typedef struct {
     char *raw;
     int (*translation)(struct linestruct *); // function pointer corresponding to a keyword
 } translation;
 
+typedef struct linestruct {
+    unsigned int fieldCount;
+    translation *keywords;
+} parsedLine;
+
 parsedLine *parseLine(FILE *fp);
 void addKeyword(translation *addition);
+void freeParsedLine(parsedLine **line);
 int initParser(int (*)(parsedLine *), int (*)(parsedLine *));
 
 #endif

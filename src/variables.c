@@ -67,10 +67,17 @@ int deleteVar(char *key) {
 	if (key == NULL)
 		return NO_VAR_NAME;
 	
-	var *variable = dereferenceVar(key);
-	if (variable == NULL)
+	int index = -1;
+	for (int i = 0; i < variables.size; i++) {
+		if (!strcmp(key, ((var *) fromList(variables, i))->key))
+			index = i;
+	}
+
+	if (index == -1)
 		return VAR_NOT_INITIALIZED;
 	
+	var *variable = fromList(variables, index);
+
 	return NO_ERROR;
 }
 
