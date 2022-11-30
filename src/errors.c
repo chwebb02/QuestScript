@@ -13,13 +13,15 @@ void errorHandler(int *errorCode) {
         return;
 
     printf("ERROR >> ");
-    switch (errorCode[1]) {
+    switch (*errorCode) {
         case FUNC_FAILED:
             printf("function failed");
             break;
         case FIELD_COUNT:
             printf("wrong field count");
             break;
+        default:
+            printf("unknown error code (%d)", *errorCode);
     }
         
     printf(" on line %d!\n", errorCode[0]);

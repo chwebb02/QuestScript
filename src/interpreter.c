@@ -8,6 +8,9 @@
 #include "parser.h"
 #include "errors.h"
 
+// REMOVE THIS
+#include "DEBUG.c"
+
 // Import a library
 int import(parsedLine *line) {
 	if (line->fieldCount > 2)
@@ -57,12 +60,13 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Initialize the components of the system
-	initParser(&import, &assign);
+	initParser(import, assign);
 
 	int line = 1;
 	int *error = malloc (2 * sizeof(int));
 	while(!feof(fp)) {
 		parsedLine *myLine = parseLine(fp);
+		printParsedLine(myLine);
 
 		errorHandler(interpretLine(&line, myLine));
 

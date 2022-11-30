@@ -8,7 +8,7 @@ typedef struct nodestruct {
 
 typedef struct {
     node *head;
-    unsigned int size;
+    int size;
 } list;
 
 list makeList();

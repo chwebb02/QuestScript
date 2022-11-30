@@ -4,6 +4,7 @@
 #include "variables.h"
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "linkedList.h"
 #include "errors.h"

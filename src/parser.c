@@ -31,7 +31,7 @@ int countFields(char *buffer) {
         }
 
         if (!open) {
-            if (buffer[i] == ' ' || buffer[i] == '\n')
+            if (buffer[i] == ' ')
                 fields += 1;
         }
 
@@ -55,27 +55,55 @@ int setFields(parsedLine *line, FILE *fp) {
     fgets(buffer, BUFSIZ, fp);
     line->fieldCount = countFields(buffer);
 
-    if (line->fieldCount = -1)
+    if (line->fieldCount == -1)
         return DANGLING_PARENTHESIS;
     
     line->keywords = malloc (line->fieldCount * sizeof(translation));
     if (line->keywords == NULL)
         return BAD_MALLOC;
-    
-    // Set raw component of field translation
-    int startPos = 0;
-    for (int i = 0; i < line->fieldCount; i++) { // iterate over the field count
-        line->keywords[i].raw = malloc (BUFSIZ * sizeof(char));
-        if (line->keywords[i].raw == NULL)
-            return BAD_MALLOC;
 
-        for (int n = startPos; n < strlen(buffer); i++) {
-            if (buffer[n] = ' ') {
-                startPos = n + 1;
-                break;
+    // Set raw component of field translation
+    // Iterate over each field in the parsedLine
+    int startPos = 0;
+    for (int word = 0; word < line->fieldCount; word++) {
+        line->keywords[word].raw = malloc (BUFSIZ * sizeof(char));
+        if (line->keywords[word].raw == NULL)
+            return BAD_MALLOC;
+        
+        // Progressively iterate over each character of the buffer
+        int open = 0; // open parentheses counter
+        for (int character = startPos; character < strlen(buffer); character++) {
+            if (open < 0)
+                return DANGLING_PARENTHESIS;
+            
+            // Opening parentheses
+            if (buffer[character] == '(')
+                open -= 1;
+            
+            // Translation for open parentheses
+            if (open) {
+                line->keywords[word].raw[character - startPos] = buffer[character];
+                continue;
+            }
+            else {
+                if (buffer[character] == ' ' || buffer[character] == '\n') {
+                    startPos = character + 1;
+                    break;
+                }
+
+                line->keywords[word].raw[character - startPos] = buffer[character];
             }
 
-            line->keywords[i].raw[n - startPos] = buffer[n];
+            // Closing parentheses
+            if (buffer[character] == ')') {
+                open -= 1;
+
+                // Exit sequence for parenthetical fields
+                if (!open) {
+                    startPos = character + 1;
+                    break;
+                }
+            }
         }
     }
 
@@ -84,18 +112,28 @@ int setFields(parsedLine *line, FILE *fp) {
 }
 
 void translateFields(parsedLine *line) {
-    for (int i = 0; i < line->fieldCount; i++) { // iterate over the number of fields
-        for (int n = 0; n < keywords.size; i++) { // iterate over the list of keywords
-            bool matchFound = false;
+    // First iterate over the number of fields in the parsedLine
+    for (int field = 0; field < line->fieldCount; field++) {
+        line->keywords[field].translation = malloc (sizeof(void *));
+        if (line->keywords[field].translation == NULL)
+            return;
+        
+        bool isMatch = false; // Value to check if a translation was assigned
+        
+        // Iterate over each keyword, checking to see if there is a translation for the field we are currently checking
+        for (int keyword = 1; keyword <= ((int) keywords.size); keyword++) {
+            // Get the comparison from the keywords list
+            translation *comparison = fromList(keywords, keyword);
 
-            if (!strcmp(fromList(keywords, (unsigned int) n), line->keywords[i].raw)) {
-                matchFound = true;
-                line->keywords[i].translation = ((translation *) fromList(keywords, (unsigned int) n))->translation;
+            if (!strcmp(line->keywords[field].raw, comparison->raw)) {
+                isMatch = false;
+                line->keywords[field].translation = comparison->translation;
+                break;
             }
-
-            if (!matchFound)
-                line->keywords[i].translation = NULL;
         }
+
+        if (!isMatch)
+            line->keywords[field].translation = NULL;
     }
 }
 
@@ -114,7 +152,9 @@ parsedLine *parseLine(FILE *fp) {
         return NULL;
 
     // Translate the raw fields of the translation
-    translateFields(&line);
+    translateFields(line);
+
+    printf("test 3\n");
 
     return line;
 }
@@ -132,7 +172,7 @@ int initParser(int (*pImport)(parsedLine *), int (*pAssign)(parsedLine *)) {
     translation import, assign;
     
     // Import translation
-    import.raw = malloc (7 * sizeof(char));
+    import.raw = malloc (8 * sizeof(char));
     if (import.raw == NULL)
         return 2;
     strcpy(import.raw, "import");
